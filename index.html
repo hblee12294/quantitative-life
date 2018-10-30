@@ -61,9 +61,10 @@
     }
 
     class TitleGrid {
-      constructor(el, title) {
+      constructor(el, title, color) {
         this._el = el
         this._title = title.toLowerCase().split(' ')
+        this._color = color
         this._alphabet = {
           a: [
             [2],
@@ -145,14 +146,16 @@
             [2]
           ]
         }
+        this._lineHeight = 7
+        this._lineWidth = 73
       }
 
       init() {
         this._title.forEach(() => {
           const frag = document.createDocumentFragment()
 
-          // 73(row) * 7(column) = 432
-          for (let i = 0; i < 73 * 7; ++i) {
+          // 73(row) * 7(column) = 511
+          for (let i = 0; i < this._lineHeight * this._lineWidth; ++i) {
             const cell = document.createElement('div')
             cell.className = "cell"
             cell.style = '--aspect-ratio: 1/1;'
@@ -170,14 +173,15 @@
         }
       }
 
-      _renderLetter(block, pos, matrix, letter) {
+      _renderLetter(line, pos, matrix, letter) {
+        const h = this._lineHeight
+        const w = this._lineWidth
+
         for (const row in matrix) {
           let rowArr = matrix[row]
 
           for (const col of rowArr) {
-            // console.log(block * 432 + row * 72 + 'upper')
-            // console.log(((6 * block) + row) * 72 + 'lower')
-            this._el.children[block * 438 + row * 73 + pos * 6 + col + 1].style.backgroundColor = '#797979'
+            this._el.children[(line * h * w) + w + (row * w) + (pos * 6) + (1 + col)].style.backgroundColor = this._color
           }
         }
       }
@@ -213,14 +217,12 @@
         this._offset = offset
       }
 
-      dye(start, offset, delay = 10) {
-        // this._set(start, offset)
+      dye(start, offset, delay = 10, color = '#777') {
+        this._set(start, offset)
 
         const dyeOne = () => {
           if (offset) {
-          console.log('dye')
-
-            this._el.children[start].style.backgroundColor = '#777'
+            this._el.children[start].style.backgroundColor = color
             start += 1
             offset -= 1
             setTimeout(dyeOne, delay)
@@ -230,7 +232,7 @@
         setTimeout(dyeOne, delay)
       }
 
-      bleach(start, offset, delay = 5) {
+      bleach(start, offset, delay = 10) {
         start || (start = this._start)
         offset || (offset = this._offset)
         let end = start + offset - 1
@@ -249,13 +251,12 @@
       }
     }
 
-    const title = new TitleGrid(el.title, 'Quantitative Life')
+    const title = new TitleGrid(el.title, 'Quantitative Life', '#777')
     const grid = new Grid(el.grid, 900)
     title.init()
     grid.init()
 
-    grid.dye(3, 3)
-    // setTimeout(grid.bleach(), 500)
+    grid.dye(0, 100)
   </script>
 </body>
 </html>
