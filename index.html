@@ -117,7 +117,7 @@
 
     @media screen and (max-width: 570px) {
       #content {
-        font-size: 1.5rem;
+        font-size: 1rem;
       }
 
       #grid {
@@ -417,15 +417,29 @@
       }, {
         line: 'If you are 30 years and in the early career. It looks different now.',
         bleach: () => grid.bleach({ interval: 20 }),
-        dye: () => grid.dye({ start: 0, offset: 360 })
+        dye: () => grid.dye({ start: 0, offset: 360, interval: 5 })
       }, {
         line: 'If you are married and have a cute baby, you are the whole world of your child before starting preschool.',
         bleach: () => grid.bleach({}),
         dye: () => grid.dye({ start: 336, offset: 36, delay: 200, color: '#3fc380' })
       }, {
-        line: 'Whether or not you are proud of your children during their primary school to college, you realize that they will eventually leave and have their own life.',
+        line: 'Accompanying children from the primary school to the college, one day you realize that they will eventually leave you and have their own life.',
         bleach: () => grid.bleach({ interval: 20 }),
         dye: () => grid.dye({ start: 396, offset: 144, color: '#81cfe0' })
+      }, {
+        line: 'Supposing your parents are 50, they have spent most of their life.',
+        bleach: () => grid.bleach({}),
+        dye: () => grid.dye({ start: 0, offset: 600,interval: 3, delay: 144 * 3 })
+      }, {
+        line: 'It means, if you meet them everyday, there are still 300 months left.',
+        bleach: () => grid.bleach({ interval: 0 }),
+        dye: () => grid.dye({ start: 600, offset: 300, interval: 7, color: '#fcb941' })
+      }, {
+        line: 'If you meet them twice in a monthes, 20 monthes left.',
+        bleach: () => grid.bleach({ start: 600, offset: 280 })
+      }, {
+        line: 'What if once in a year?',
+        bleach: () => grid.bleach({ start: 880, offset: 19 , interval: 25 })
       }]
 
       function nextHandle() {
@@ -436,7 +450,6 @@
         lineObj.dye && lineObj.dye()
 
         if (++lineIndex === lines.length) {
-          console.log('remove')
           el.control.removeEventListener('click', nextHandle)
           lineIndex = 0 // no use
         }
