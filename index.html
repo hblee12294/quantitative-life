@@ -137,7 +137,7 @@
     <header id="title"></header>
     <main id="main">
       <div id="grid"></div>
-      <p id="content">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vitae, rerum vero nisi ut corrupti optio fugiat mollitia eaque pariatur perferendis autem! Error accusantium saepe aliquam similique, velit amet animi dignissimos.</p>
+      <p id="content">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vitae, rerum vero nisi ut corrupti optio fugiat mollitia eaque pariatur perferendis</p>
     </main>
     <button id="control">START</button>
   </div>
@@ -326,6 +326,10 @@
         this._cellsNum = cellsNum
         this._start = 0
         this._offset = 0
+
+        this.init = this.init.bind(this)
+        this.dye = this.dye.bind(this)
+        this.bleach = this.bleach.bind(this)
       }
 
       init() {
@@ -349,7 +353,7 @@
         this._offset = offset
       }
 
-      dye(start, offset, delay = 10, color = '#777') {
+      dye({ start, offset, interval = 6, delay = interval, color = '#777' }) {
         this._set(start, offset)
 
         const dyeOne = () => {
@@ -357,16 +361,14 @@
             this._el.children[start].style.backgroundColor = color
             start += 1
             offset -= 1
-            setTimeout(dyeOne, delay)
+            setTimeout(dyeOne, interval)
           }
         }
 
         setTimeout(dyeOne, delay)
       }
 
-      bleach(start, offset, delay = 10) {
-        start || (start = this._start)
-        offset || (offset = this._offset)
+      bleach({ start = this._start, offset = this._offset, interval = 3, delay = interval }) {
         let end = start + offset - 1
 
         const bleachOne = () => {
@@ -374,7 +376,7 @@
             this._el.children[end].style.backgroundColor = ''
             --end
             --offset
-            setTimeout(bleachOne, delay)
+            setTimeout(bleachOne, interval)
           }
         }
 
@@ -383,23 +385,53 @@
       }
     }
 
-    const lines = [
-      {
-        content: 'A total of 900 boxes above. You may have guessed, it\s 900 monthes you probably have in your life.'
-      }
-    ]
-
     function start() {
       const title = new TitleGrid(el.title, 'Quantitative Life')
       const grid = new Grid(el.grid, 900)
+      let lineIndex = 0
       title.init()
       title.dye('#777')
       grid.init()
 
-      el.control.onclick = () => {
+      el.control.addEventListener('click', startHandle)
+
+      function startHandle() {
         title.bleach()
-        el.control.textContent = 'NEXT'
         el.container.classList.add('bottom')
+        el.control.removeEventListener('click', startHandle)
+
+        el.control.textContent = 'NEXT'
+        el.control.addEventListener('click', nextHanle)
+      }
+
+      // limit: Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vitae, rerum vero nisi ut corrupti optio fugiat mollitia eaque pariatur perferendis
+      const lines = [{
+        line: 'A total of 900 boxes above. You may have guessed, it\s 900 monthes you probably have in your life.'
+      }, {
+        line: 'If you are in college, 20 years old, your life just starts.',
+        dye: () => grid.dye({ start: 0, offset: 240 })
+      }, {
+        line: 'If you have a half-year relationship in college, his/her time left in your life.',
+        bleach: () => grid.bleach({}),
+        dye: () => grid.dye({ start: 220, offset: 6 , delay: 100 })
+      }]
+
+      function nextHanle() {
+        const lineObj = lines[lineIndex]
+        el.content.textContent = lineObj.line
+        
+        lineObj.bleach && lineObj.bleach()
+        lineObj.dye && lineObj.dye()
+
+        if (++lineIndex === lines.length) {
+          console.log('remove')
+          el.control.removeEventListener('click', nextHanle)
+          lineIndex = 0 // no use
+        }
+      }
+
+      function restartHandle() {
+
       }
     }
 
