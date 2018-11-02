@@ -401,22 +401,34 @@
         el.control.removeEventListener('click', startHandle)
 
         el.control.textContent = 'NEXT'
-        el.control.addEventListener('click', nextHanle)
+        el.control.addEventListener('click', nextHandle)
       }
 
       // limit: Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vitae, rerum vero nisi ut corrupti optio fugiat mollitia eaque pariatur perferendis
       const lines = [{
-        line: 'A total of 900 boxes above. You may have guessed, it\s 900 monthes you probably have in your life.'
+        line: 'A total of 900 boxes above. You may have guessed, it\'s 900 monthes you probably have in your life.'
       }, {
         line: 'If you are in college, 20 years old, your life just starts.',
         dye: () => grid.dye({ start: 0, offset: 240 })
       }, {
-        line: 'If you have a half-year relationship in college, his/her time left in your life.',
+        line: 'If you have a half-year relationship in college, his/her time left in your life is like this.',
         bleach: () => grid.bleach({}),
-        dye: () => grid.dye({ start: 220, offset: 6 , delay: 100 })
+        dye: () => grid.dye({ start: 220, offset: 6, interval: 50, delay: 150, color: '#e26a6a' })
+      }, {
+        line: 'If you are 30 years and in the early career. It looks different now.',
+        bleach: () => grid.bleach({ interval: 20 }),
+        dye: () => grid.dye({ start: 0, offset: 360 })
+      }, {
+        line: 'If you are married and have a cute baby, you are the whole world of your child before starting preschool.',
+        bleach: () => grid.bleach({}),
+        dye: () => grid.dye({ start: 336, offset: 36, delay: 200, color: '#3fc380' })
+      }, {
+        line: 'Whether or not you are proud of your children during their primary school to college, you realize that they will eventually leave and have their own life.',
+        bleach: () => grid.bleach({ interval: 20 }),
+        dye: () => grid.dye({ start: 396, offset: 144, color: '#81cfe0' })
       }]
 
-      function nextHanle() {
+      function nextHandle() {
         const lineObj = lines[lineIndex]
         el.content.textContent = lineObj.line
         
@@ -425,7 +437,7 @@
 
         if (++lineIndex === lines.length) {
           console.log('remove')
-          el.control.removeEventListener('click', nextHanle)
+          el.control.removeEventListener('click', nextHandle)
           lineIndex = 0 // no use
         }
       }
