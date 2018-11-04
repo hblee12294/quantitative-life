@@ -109,6 +109,10 @@
         font-size: 2rem;
       }
 
+      #grid {
+        grid-template-columns: repeat(45, 1fr);
+      }
+
       #control {
         font-size: 2rem;
         border: 4px dashed #aaa;
@@ -117,11 +121,23 @@
 
     @media screen and (max-width: 570px) {
       #content {
-        font-size: 1rem;
+        font-size: 1.5rem;
+      }
+
+      #control {
+        font-size: 1.3rem;
+        border: 3px dashed #aaa;
+      }
+    }
+
+    @media screen and (max-width: 420px) {
+      #content {
+        margin: .5rem auto 0;
+        padding: 0 1rem;
+        font-size: 1.1rem;
       }
 
       #grid {
-        /* grid-template-columns: repeat(auto-fill, minmax(15px, 5fr)); */
         grid-template-columns: repeat(30, 1fr);
       }
 
@@ -137,7 +153,7 @@
     <header id="title"></header>
     <main id="main">
       <div id="grid"></div>
-      <p id="content">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vitae, rerum vero nisi ut corrupti optio fugiat mollitia eaque pariatur perferendis</p>
+      <p id="content">Press NEXT button to start.</p>
     </main>
     <button id="control">START</button>
   </div>
@@ -389,6 +405,7 @@
       const title = new TitleGrid(el.title, 'Quantitative Life')
       const grid = new Grid(el.grid, 900)
       let lineIndex = 0
+      let resetLineIndex = 0
       title.init()
       title.dye('#777')
       grid.init()
@@ -408,46 +425,46 @@
       const lines = [{
         line: 'A total of 900 boxes above. You may have guessed, it\'s 900 monthes you probably have in your life.'
       }, {
-        line: 'If you are in college, 20 years old, your life just starts.',
-        dye: () => grid.dye({ start: 0, offset: 240 })
+        line: 'If you are in college, 20 years old, your life just begins.',
+        dye: { start: 0, offset: 240 }
       }, {
         line: 'If you have a half-year relationship in college, his/her time left in your life is like this.',
-        bleach: () => grid.bleach({}),
-        dye: () => grid.dye({ start: 220, offset: 6, interval: 50, delay: 150, color: '#e26a6a' })
+        bleach: {},
+        dye: { start: 220, offset: 6, interval: 50, delay: 150, color: '#e26a6a' }
       }, {
-        line: 'If you are 30 years and in the early career. It looks different now.',
-        bleach: () => grid.bleach({ interval: 20 }),
-        dye: () => grid.dye({ start: 0, offset: 360, interval: 5 })
+        line: 'If you are 30 years old, in your early career, the remaining time is enough to explore the possibilities of your life.',
+        bleach: { interval: 20 },
+        dye: { start: 0, offset: 360, interval: 5 }
       }, {
         line: 'If you are married and have a cute baby, you are the whole world of your child before starting preschool.',
-        bleach: () => grid.bleach({}),
-        dye: () => grid.dye({ start: 336, offset: 36, delay: 200, color: '#3fc380' })
+        bleach: {},
+        dye: { start: 336, offset: 36, delay: 200, color: '#3fc380' }
       }, {
-        line: 'Accompanying children from the primary school to the college, one day you realize that they will eventually leave you and have their own life.',
-        bleach: () => grid.bleach({ interval: 20 }),
-        dye: () => grid.dye({ start: 396, offset: 144, color: '#81cfe0' })
+        line: 'Accompanying children from primary school to college, one day, you realize that they will eventually leave you and have their own life.',
+        bleach: { interval: 20 },
+        dye: { start: 396, offset: 144, color: '#81cfe0' }
       }, {
         line: 'Supposing your parents are 50, they have spent most of their life.',
-        bleach: () => grid.bleach({}),
-        dye: () => grid.dye({ start: 0, offset: 600,interval: 4, delay: 144 * 3 })
+        bleach: {},
+        dye: { start: 0, offset: 600,interval: 4, delay: 144 * 3 }
       }, {
-        line: 'It means, if you meet them everyday, there are still 300 months left.',
-        bleach: () => grid.bleach({ interval: 0 }),
-        dye: () => grid.dye({ start: 600, offset: 300, interval: 7, color: '#fcb941' })
+        line: 'It means, if you meet them everyday, the total time you can be with them is 300 monthes.',
+        bleach: { interval: 0 },
+        dye: { start: 600, offset: 300, interval: 7, color: '#fcb941' }
       }, {
-        line: 'If you meet them twice in a monthes, 20 monthes left.',
-        bleach: () => grid.bleach({ start: 600, offset: 280 })
+        line: 'If you meet them twice in a month, there are still 20 monthes, more than one and a half years.',
+        bleach: { start: 600, offset: 280 }
       }, {
-        line: 'What if once in a year?',
-        bleach: () => grid.bleach({ start: 880, offset: 19 , interval: 25 })
+        line: 'What if you meet them once in a year? One monthes.',
+        bleach: { start: 880, offset: 19 , interval: 25 }
       }]
 
       function nextHandle() {
         const lineObj = lines[lineIndex]
         el.content.textContent = lineObj.line
         
-        lineObj.bleach && lineObj.bleach()
-        lineObj.dye && lineObj.dye()
+        lineObj.bleach && grid.bleach(lineObj.bleach)
+        lineObj.dye && grid.dye(lineObj.dye)
 
         if (++lineIndex === lines.length) {
           el.control.removeEventListener('click', nextHandle)
@@ -457,14 +474,29 @@
         }
       }
 
-      function restartHandle() {
-        grid.bleach({ start: 899, offset: 1 })
-        grid.dye({ start: 0, offset: 900, interval: 4 })
-        el.content.textContent = ''
+      const resetLines = [{
+        line: 'No, you can not restart. There\'s no RESTART button in real life.',
+        bleach: { start: 899, offset: 1 },
+        dye: { start: 0, offset: 900, interval: 4 }
+      }]
 
-        setTimeout( () => {
-          el.content.textContent = 'No, you can not restart. There\'s no \'RESTART\' button in life. '
-        }, 900 * 4)
+      function restartHandle() {
+        const lineObj = resetLines[resetLineIndex]
+
+        lineObj.bleach && grid.bleach(lineObj.bleach)
+        lineObj.dye && grid.dye(lineObj.dye)
+
+        if (!resetLineIndex) {
+          el.content.textContent = ''
+
+          setTimeout(() => {
+            el.content.textContent = lineObj.line
+          }, 900 * 4)
+        }
+
+        if (++resetLineIndex === resetLines.length) {
+          el.control.removeEventListener('click', restartHandle)
+        }
       }
     }
 
