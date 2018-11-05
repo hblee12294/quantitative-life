@@ -445,7 +445,7 @@
         this._offset = offset
       }
 
-      dye({ start, offset, interval = 6, delay = interval, color = '#777' }) {
+      dye({ start, offset, interval = 6, delay = interval, color = '#777' }, idle = {}) {
         this._set(start, offset)
 
         const dyeOne = () => {
@@ -454,13 +454,15 @@
             start += 1
             offset -= 1
             setTimeout(dyeOne, interval)
+          } else {
+            idle.dye = true
           }
         }
 
         setTimeout(dyeOne, delay)
       }
 
-      bleach({ start = this._start, offset = this._offset, interval = 4, delay = interval }) {
+      bleach({ start = this._start, offset = this._offset, interval = 4, delay = interval }, idle = {}) {
         let end = start + offset - 1
 
         const bleachOne = () => {
@@ -469,11 +471,14 @@
             --end
             --offset
             setTimeout(bleachOne, interval)
+          } else {
+            idle.bleach = true
           }
         }
 
         setTimeout(bleachOne, delay)
         this._reset()
+        return true
       }
     }
 
@@ -482,6 +487,10 @@
       const grid = new Grid(el.grid, 900)
       let lineIndex = 0
       let resetLineIndex = 0
+      const idle = {
+        dye: true,
+        bleach: true
+      }
       title.init()
       title.dye('#777')
       grid.init()
@@ -536,17 +545,21 @@
       }]
 
       function nextHandle() {
-        const lineObj = lines[lineIndex]
-        el.content.textContent = lineObj.line
-        
-        lineObj.bleach && grid.bleach(lineObj.bleach)
-        lineObj.dye && grid.dye(lineObj.dye)
+        if (idle.dye && idle.bleach) {
+          idle.dye = idle.bleach = false
 
-        if (++lineIndex === lines.length) {
-          el.control.removeEventListener('click', nextHandle)
-          lineIndex = 0 // no use
-          el.control.textContent = 'RESTART'
-          el.control.addEventListener('click', restartHandle)
+          const lineObj = lines[lineIndex]
+          el.content.textContent = lineObj.line
+          
+          lineObj.bleach ? grid.bleach(lineObj.bleach, idle) : idle.bleach = true
+          lineObj.dye ? grid.dye(lineObj.dye, idle) : idle.dye = true
+
+          if (++lineIndex === lines.length) {
+            el.control.removeEventListener('click', nextHandle)
+            lineIndex = 0 // no use
+            el.control.textContent = 'RESTART'
+            el.control.addEventListener('click', restartHandle)
+          }
         }
       }
 
@@ -561,25 +574,28 @@
       }]
 
       function restartHandle() {
-        const lineObj = resetLines[resetLineIndex]
+        if (idle.dye && idle.bleach) {
+          idle.dye = idle.bleach = false
 
-        lineObj.bleach && grid.bleach(lineObj.bleach)
-        lineObj.dye && grid.dye(lineObj.dye)
+          const lineObj = resetLines[resetLineIndex]
 
-        if (!resetLineIndex) {
-          el.content.textContent = ''
+          lineObj.bleach ? grid.bleach(lineObj.bleach, idle) : idle.bleach = true
+          lineObj.dye ? grid.dye(lineObj.dye, idle) : idle.dye = true
 
-          setTimeout(() => {
+          if (!resetLineIndex) {
+            el.content.textContent = ''
+
+            setTimeout(() => {
+              el.content.textContent = lineObj.line
+            }, 900 * 4)
+          } else {
             el.content.textContent = lineObj.line
-          }, 900 * 4)
-        } else {
-          el.content.textContent = lineObj.line
-        }
+          }
 
-        if (++resetLineIndex === resetLines.length) {
-          console.log('remove')
-          resetLineIndex = 0 // no use
-          el.control.removeEventListener('click', restartHandle)
+          if (++resetLineIndex === resetLines.length) {
+            resetLineIndex = 0 // no use
+            el.control.removeEventListener('click', restartHandle)
+          }
         }
       }
     }
