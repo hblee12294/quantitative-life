@@ -38,6 +38,11 @@
       font-size: 3rem;
     }
 
+    #content::selection {
+      color: white;
+      background-color: #777;
+    }
+
     /* Grid */
     #grid {
       display: grid;
@@ -94,14 +99,59 @@
       font-size: 3rem;
       padding: 5px 15px;
       border: 5px dashed #aaa;
+      outline: none;
       background-color: #fff;
       cursor: pointer;
-      transition: top .3s ease-out, transform .3s ease-out;
+      user-select: none;
+      transition: .3s ease-out;
+    }
+
+    #control:hover, #control:focus {
+      color: #777;
+      background-color: #f1f1f1;
     }
 
     .bottom #control {
       top: 100%;
       transform: translate(-50%, -150%)
+    }
+
+    footer {
+      position: absolute;
+      right: 0;
+      bottom: 1rem;
+      left: 0;
+      padding-right: 1rem;
+      color: #aaa;
+      font-size: 1rem;
+      text-align: right;
+      user-select: none;
+    }
+
+    footer a {
+      color: #aaa;
+      text-decoration: none;
+      cursor: pointer;
+      outline: none;
+      transition: .2s;
+    }
+
+    footer a:focus {
+      padding-right: .5rem;
+      color: #777;
+    }
+
+    footer span {
+      display: inline-block;
+      height: .8rem;
+      width: .8rem;
+      margin: 0 5px;
+      border: 2px dashed #aaa;
+      border-radius: 5%;
+      font-size: .8rem;
+      font-weight: bold;
+      line-height: 1rem;
+      text-align: center;
     }
 
     @media screen and (max-width: 850px) {
@@ -125,7 +175,7 @@
       }
 
       #control {
-        font-size: 1.3rem;
+        font-size: 1.5rem;
         border: 3px dashed #aaa;
       }
     }
@@ -145,6 +195,28 @@
         font-size: 1.3rem;
         border: 3px dashed #aaa;
       }
+
+      footer {
+        position: absolute;
+        right: 0;
+        bottom: .5rem;
+        left: 0;
+        color: #aaa;
+        font-size: 1rem;
+        text-align: right;
+      }
+
+      footer span {
+        display: inline-block;
+        height: .8rem;
+        width: .8rem;
+        margin: 0 5px;
+        border: 2px dashed #aaa;
+        border-radius: 5%;
+        font-size: .8rem;
+        font-weight: bold;
+        line-height: 1rem;
+      }
     }
   </style>
 </head>
@@ -156,6 +228,10 @@
       <p id="content">Press NEXT button to start.</p>
     </main>
     <button id="control">START</button>
+
+    <footer>
+      <a href="https://hongbinli.com" target="_blank">HONGBIN</a><span>C</span>2018
+    </footer>
   </div>
 
   <script>
@@ -455,7 +531,7 @@
         line: 'If you meet them twice in a month, there are still 20 monthes, more than one and a half years.',
         bleach: { start: 600, offset: 280 }
       }, {
-        line: 'What if you meet them once in a year? One monthes.',
+        line: 'What if you meet them once in a year? Only one month.',
         bleach: { start: 880, offset: 19 , interval: 25 }
       }]
 
@@ -478,6 +554,10 @@
         line: 'No, you can not restart. There\'s no RESTART button in real life.',
         bleach: { start: 899, offset: 1 },
         dye: { start: 0, offset: 900, interval: 4 }
+      }, {
+        line: 'Seriously, '
+      }, {
+        line: 'It\'s never too late.'
       }]
 
       function restartHandle() {
@@ -492,16 +572,19 @@
           setTimeout(() => {
             el.content.textContent = lineObj.line
           }, 900 * 4)
+        } else {
+          el.content.textContent = lineObj.line
         }
 
         if (++resetLineIndex === resetLines.length) {
+          console.log('remove')
+          resetLineIndex = 0 // no use
           el.control.removeEventListener('click', restartHandle)
         }
       }
     }
 
     start()
-
   </script>
 </body>
 </html>
